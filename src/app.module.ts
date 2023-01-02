@@ -3,17 +3,18 @@ import { ConfigModule } from '@nestjs/config';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { BotService } from './bot/bot.service';
 import { BotModule } from './bot/bot.module';
+import { ParserModule } from './parser/parser.module';
 
 @Module({
   imports: [
-    BotModule,
     ConfigModule.forRoot({
       envFilePath: '.env',
     }),
+    BotModule,
+    ParserModule,
   ],
   controllers: [AppController],
-  providers: [AppService, BotService],
+  providers: [AppService],
 })
 export class AppModule {}
