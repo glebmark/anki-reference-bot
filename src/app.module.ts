@@ -11,7 +11,7 @@ import { BotModule } from './bot/bot.module';
     BotModule,
     ConfigModule.forRoot({
       envFilePath: '.env',
-    })
+    }),
   ],
   controllers: [AppController],
   providers: [AppService, BotService],
