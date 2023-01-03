@@ -1,13 +1,23 @@
-import { Injectable } from '@nestjs/common';
-import { Context } from 'grammy';
+import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Bot, Context } from 'grammy';
+import { ParserService } from '../parser/parser.service';
 import { regExpAllLanguages } from './bot.constants';
 
 @Injectable()
-export class BotService {
-  // @Inject(ParserService)
-  // private parserService: ParserService;
-  constructor() {}
+export class BotService implements OnModuleInit {
+  
+  constructor(
+    private parserService: ParserService,
+  ) {}
 
+  onModuleInit() {
+
+    const bot = new Bot(process.env.BOT_TOKEN);
+
+    bot.on("message:text", this.onMessage);
+
+    bot.start();
+  }
 
   onMessage = async (ctx: Context) => {
     const isSuitableText = ctx.hasText(regExpAllLanguages);
@@ -16,15 +26,8 @@ export class BotService {
       ctx.reply('Bot accepts only text characters');
     }
 
-    // const definitions = await this.parserService.getDefinitions()
+    const definitions = await this.parserService.getDefinitions()
     
-
-    // console.dir(definitions, { depth: 10 })
-
-    console.log('onMessage')
-    
-    ctx.reply('Echo: ' + ctx.message.text);
-
-    // console.dir(ctx, { depth: 10 });
+    ctx.reply('Echow: ' + ctx.message.text);
   };
 }
