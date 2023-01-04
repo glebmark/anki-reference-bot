@@ -12,9 +12,9 @@ export class BotService implements OnModuleInit {
 
     bot.on('message:text', this.onMessage);
 
-    const definitions = await this.parserService.getDefinitions();
+    const definitions = await this.parserService.getDefinitions('make out some');
 
-    console.dir(definitions, { depth: 10 });
+    // console.dir(definitions, { depth: 10 });
 
     bot.start();
   }
@@ -22,12 +22,22 @@ export class BotService implements OnModuleInit {
   onMessage = async (ctx: Context) => {
     const isSuitableText = ctx.hasText(regExpAllLanguages);
 
+    // TODO prevent error on /commands
+
     if (!isSuitableText) {
       ctx.reply('Bot accepts only text characters');
     }
 
-    const definitions = await this.parserService.getDefinitions();
+    const definitions = await this.parserService.getDefinitions(
+      ctx.message.text,
+    );
 
-    ctx.reply('Echow: ' + ctx.message.text);
+    if (!definitions) {
+      ctx.reply('Requested word haven\'t been found');  
+    } else {
+      ctx.reply(JSON.stringify(definitions));
+    }
+
+    // TODO form appropriate response in html or another form
   };
 }
