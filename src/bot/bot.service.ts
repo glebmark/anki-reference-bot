@@ -5,16 +5,16 @@ import { regExpAllLanguages } from './bot.constants';
 
 @Injectable()
 export class BotService implements OnModuleInit {
-  
-  constructor(
-    private parserService: ParserService,
-  ) {}
+  constructor(private parserService: ParserService) {}
 
-  onModuleInit() {
-
+  async onModuleInit() {
     const bot = new Bot(process.env.BOT_TOKEN);
 
-    bot.on("message:text", this.onMessage);
+    bot.on('message:text', this.onMessage);
+
+    const definitions = await this.parserService.getDefinitions();
+
+    console.dir(definitions, { depth: 10 });
 
     bot.start();
   }
@@ -26,8 +26,8 @@ export class BotService implements OnModuleInit {
       ctx.reply('Bot accepts only text characters');
     }
 
-    const definitions = await this.parserService.getDefinitions()
-    
+    const definitions = await this.parserService.getDefinitions();
+
     ctx.reply('Echow: ' + ctx.message.text);
   };
 }
