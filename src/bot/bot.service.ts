@@ -28,12 +28,10 @@ export class BotService implements OnModuleInit {
       ctx.reply('Bot accepts only text characters');
     }
 
-    const definitions = await this.parserService.getDefinitions(
-      ctx.message.text,
-    );
+    const definitions = await this.parserService.getDefinitions(ctx.message.text);
 
     if (!definitions) {
-      ctx.reply('Requested word haven\'t been found');  
+      ctx.reply("Requested word haven't been found");
     } else {
       ctx.reply(JSON.stringify(definitions));
     }
