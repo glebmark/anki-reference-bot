@@ -1,11 +1,16 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Bot, Context } from 'grammy';
+
 import { ParserService } from '../parser/parser.service';
+import { SpeechService } from '../speech/speech.service';
 import { regExpAllLanguages } from './bot.constants';
 
 @Injectable()
 export class BotService implements OnModuleInit {
-  constructor(private parserService: ParserService) {}
+  constructor(
+    private parserService: ParserService,
+    private speechService: SpeechService,
+    ) {}
 
   async onModuleInit() {
     const bot = new Bot(process.env.BOT_TOKEN);
@@ -34,10 +39,18 @@ export class BotService implements OnModuleInit {
 
     if (ctx.message.from.id === +process.env.TEST_USER) {
       
+      await this.speechService.getSpeech()
+
     }
+
 
     ctx.reply(definitions ? JSON.stringify(definitions) : "Requested word haven't been found");
 
     // TODO form appropriate response in html or another form
   };
+
+
+
+
+    
 }

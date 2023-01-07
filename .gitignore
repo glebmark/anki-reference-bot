@@ -4,6 +4,9 @@
 # JSON key
 google_cloud_key.json
 
+# data
+/audio
+
 # compiled output
 /dist
 /node_modules
