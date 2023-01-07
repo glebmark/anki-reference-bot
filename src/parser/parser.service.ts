@@ -23,6 +23,8 @@ export class ParserService {
       .map((entry) => {
         const title = entry.querySelector(`.di-title`).rawText;
 
+        // TODO add transcription
+
         const definitions = entry.querySelectorAll(`.pr.dsense`).map((definition) => {
           const definitionName = definition.querySelector(`.def.ddef_d.db`).rawText;
 

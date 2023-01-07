@@ -9,8 +9,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { BotModule } from './bot/bot.module';
 import { ParserModule } from './parser/parser.module';
-import { SpeechService } from './speech/speech.service';
 import { SpeechModule } from './speech/speech.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -40,6 +40,7 @@ import { SpeechModule } from './speech/speech.module';
     BotModule,
     ParserModule,
     SpeechModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],

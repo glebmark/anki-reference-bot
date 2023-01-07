@@ -17,7 +17,7 @@ export class BotService implements OnModuleInit {
 
     bot.on('message:text', this.onMessage);
 
-    const definitions = await this.parserService.getDefinitions('make out some');
+    const definitions = await this.parserService.getDefinitions('think');
 
     // console.dir(definitions, { depth: 10 });
 
@@ -37,9 +37,11 @@ export class BotService implements OnModuleInit {
 
     const definitions = await this.parserService.getDefinitions(ctx.message.text);
 
+    console.dir(definitions, { depth: 10 });
+
     if (ctx.message.from.id === +process.env.TEST_USER) {
       
-      await this.speechService.getSpeech()
+      // await this.speechService.getSpeech()
 
     }
 
