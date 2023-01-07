@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, PrimaryGeneratedColumn, ManyToMany, PrimaryColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import { Example } from './example.entity';
 import { Title } from './title.entity';
 
@@ -7,12 +7,8 @@ export class Definition extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  titleId: number;
-
-  @ManyToOne(() => Title)
-  @JoinColumn({ name: 'titleId' })
-  title: Title;
+  @ManyToOne(() => Title, (title) => title.definitions)
+  title: Title
 
   @Column({
     type: 'text',
@@ -20,6 +16,6 @@ export class Definition extends BaseEntity {
   })
   definition: string;
 
-  @OneToMany(() => Example, (example) => example.definition)
+  @OneToMany(() => Example, (example) => example.definition, { cascade: ["insert", "update"], eager: true })
   examples: Example[]
 }

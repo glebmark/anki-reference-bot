@@ -17,6 +17,6 @@ export class User extends BaseEntity {
   })
   createdAt: Date;
 
-  @OneToMany(() => TitleUserProgress, (title) => title.user)
+  @OneToMany(() => TitleUserProgress, (title) => title.user, { cascade: ["insert", "update"], eager: true })
   titles: TitleUserProgress[]
 }

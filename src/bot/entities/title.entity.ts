@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, OneToMany } from 'typeorm';
+import { BaseEntity, Column, Entity, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, JoinTable, ManyToMany, PrimaryColumn, OneToMany } from 'typeorm';
 import { Definition } from './definition.entity';
 
 export enum LanguageType {
@@ -37,6 +37,6 @@ export class Title extends BaseEntity {
   })
   partOfSpeech: string;
 
-  @OneToMany(() => Definition, (definition) => definition.title)
-  titles: Definition[]
+  @OneToMany(() => Definition, (definition) => definition.title, { cascade: true, eager: true})
+  definitions: Definition[]
 }

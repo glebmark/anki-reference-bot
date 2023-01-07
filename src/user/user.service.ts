@@ -10,14 +10,8 @@ export class UserService {
     constructor(
         @InjectRepository(User)
         private userRepository: Repository<User>,
-    ) {
-        this.getUser()
-    }
+    ) {}
 
-    getUser = async () => {
-        console.dir(await this.userRepository.find({
-            relations: ['titles']
-        }), { depth: 10 })
-    }
+    
 
 }

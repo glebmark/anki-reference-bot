@@ -14,7 +14,7 @@ export class ParserService {
     const englishDictionary = root.querySelector(`[data-id="cald4"]`);
 
     if (!englishDictionary) {
-      return englishDictionary;
+      return null;
     }
 
     return englishDictionary
