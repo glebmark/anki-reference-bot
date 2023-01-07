@@ -19,6 +19,7 @@ export const createConfig = ({
 }: ConfigOptions) => {
   let config: DataSourceOptions = {
     type: 'postgres' as const,
+    database: 'telegrambot',
     url,
     migrationsRun: false,
     migrationsTableName: 'migrations',

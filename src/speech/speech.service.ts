@@ -1,4 +1,7 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Speech } from './entities/speech.entity';
 
 const textToSpeech = require('@google-cloud/text-to-speech');
 const fs = require('fs')
@@ -6,6 +9,12 @@ const util = require('util')
 
 @Injectable()
 export class SpeechService {
+
+    constructor (
+        @InjectRepository(Speech)
+        private speechRepository: Repository<Speech>,
+    ) {}
+
     getSpeech = async () => {
         const client = new textToSpeech.TextToSpeechClient();
   
@@ -22,6 +31,8 @@ export class SpeechService {
         const path = './audio/'
 
         const filename = 'output.mp3'
+
+        await this.speechRepository.save({name: 'dsf'})
   
         const writeFile = util.promisify(fs.writeFile);
         await writeFile(`${path}${filename}`, response.audioContent, 'binary');

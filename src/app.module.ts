@@ -17,7 +17,6 @@ import { SpeechModule } from './speech/speech.module';
     ConfigModule.forRoot({
       envFilePath: '.env',
       validationSchema: Joi.object({
-        PORT: Joi.number().default(3000),
         DB_URL: Joi.string().required(),
         LOG_QUERIES: Joi.boolean().required(),
         SYNCHRONIZE: Joi.boolean().required(),
@@ -43,6 +42,6 @@ import { SpeechModule } from './speech/speech.module';
     SpeechModule,
   ],
   controllers: [AppController],
-  providers: [AppService, SpeechService],
+  providers: [AppService],
 })
 export class AppModule {}
