@@ -24,7 +24,6 @@ export class ParserService {
         const title = entry.querySelector(`.di-title`).rawText;
 
         const definitions = entry.querySelectorAll(`.pr.dsense`).map((definition) => {
-          
           const definitionName = definition.querySelector(`.def.ddef_d.db`).rawText;
 
           const exampleBlock = definition.querySelector(`.def-body.ddef_b`);

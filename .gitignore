@@ -1,6 +1,9 @@
 # envs
 .env*
 
+# JSON key
+google_cloud_key.json
+
 # compiled output
 /dist
 /node_modules

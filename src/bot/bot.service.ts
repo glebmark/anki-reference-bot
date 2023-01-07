@@ -16,6 +16,8 @@ export class BotService implements OnModuleInit {
 
     // console.dir(definitions, { depth: 10 });
 
+    bot.api.sendMessage(process.env.TEST_USER, `Bot started at ${new Date()}`);
+
     bot.start();
   }
 
@@ -30,11 +32,11 @@ export class BotService implements OnModuleInit {
 
     const definitions = await this.parserService.getDefinitions(ctx.message.text);
 
-    if (!definitions) {
-      ctx.reply("Requested word haven't been found");
-    } else {
-      ctx.reply(JSON.stringify(definitions));
+    if (ctx.message.from.id === +process.env.TEST_USER) {
+      
     }
+
+    ctx.reply(definitions ? JSON.stringify(definitions) : "Requested word haven't been found");
 
     // TODO form appropriate response in html or another form
   };
