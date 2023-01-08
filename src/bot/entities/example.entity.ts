@@ -6,7 +6,11 @@ export class Example extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column()
+  definitionId: number;
+
   @ManyToOne(() => Definition, (definition) => definition.examples)
+  @JoinColumn({ name: 'definitionId' })
   definition: Definition
 
   @Column({

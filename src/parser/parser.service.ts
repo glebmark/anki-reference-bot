@@ -4,7 +4,7 @@ import { parse } from 'node-html-parser';
 
 @Injectable()
 export class ParserService {
-  getDefinitions = async (text: string) => {
+  getTitles = async (text: string) => {
     const textToUrl = text.replace(/\s\b/g, '-');
 
     const rawHtml = await axios.get(`https://dictionary.cambridge.org/dictionary/english/${textToUrl}`);

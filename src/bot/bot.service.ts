@@ -31,11 +31,6 @@ export class BotService implements OnModuleInit {
 
     bot.on('message:text', this.onMessage);
 
-    // TODO delete
-    const definitions = await this.parserService.getDefinitions('think');
-
-    // console.dir(definitions, { depth: 10 });
-
     bot.api.sendMessage(process.env.TEST_USER, `Bot started at ${new Date()}`);
 
     bot.start();
@@ -50,65 +45,39 @@ export class BotService implements OnModuleInit {
       ctx.reply('Bot accepts only text characters');
     }
 
-    const definitions = await this.parserService.getDefinitions(ctx.message.text);
+    const titles = await this.parserService.getTitles(ctx.message.text);
 
-    // console.dir(definitions, { depth: 10 });
+    console.dir(titles, { depth: 10 });
 
     // add transcription
     // add partOfSpeech
 
-    let counter = 0
+    const titlesToSave = titles.map(title => {
 
-    // const definitionsToSave = definitions.map(title => {
-    //   console.log(counter)
-    //   counter++
+      const definitions = title.definitions.map(definition => {
 
-    //   const definitions = title.definitions.map(definition => {
+        const examples = definition.examples.map(example => {
+          return Example.create({
+            example,
+          })
+        })
         
-    //     return Definition.create({ titleId: title.title, definition: definition.definitionName})
-
-    //   //   {
-    //   //   titleId: title.title,
-    //   //   definition: definition.definitionName,
-    //   //   // examples: definition.examples.map(example => ({
-    //   //   //   example,
-    //   //   // }))
-    //   // }
+        return Definition.create({ definition: definition.definitionName, examples: examples})
     
-    //   })
+      })
 
-    //   console.log(definitions)
+      return Title.create({
+        title: title.title,
+        languageType: LanguageType.ENGLISH,
+        definitions: definitions, // make shorter
+      })
+    })
 
-    //   return Title.create({
-    //     title: title.title,
-    //     languageType: LanguageType.ENGLISH,
-    //     definitions: definitions,
-    //   })
-    // })
+    const savedTitles = await this.titleRepository.save(titlesToSave)
 
-    // console.dir(definitionsToSave, { depth: 10 })
-
-    const def = Definition.create({ definition: 'test_definition'})
-
-    const def2 = Definition.create({ definition: 'test_definition_2'})
-
-    // const defToSave = {
-    //   title: 'test_title', 
-    //   languageType: LanguageType.ENGLISH,
-    //   definitions: [def]
-    // }
-
-    const defToSave2 = {
-      title: 'test_title', 
-      languageType: LanguageType.ENGLISH,
-      definitions: [def, def2]
-    }
-
-    const savedTitles2 = await this.titleRepository.save(defToSave2)
-
-
-    // const savedTitles = await this.titleRepository.save(definitionsToSave)
-
+    // await this.definitionRepository.find({where: {
+    //   titleId: 1
+    // }})
 
 
     if (ctx.message.from.id === +process.env.TEST_USER) {
@@ -118,13 +87,8 @@ export class BotService implements OnModuleInit {
     }
 
 
-    ctx.reply(definitions ? JSON.stringify(definitions) : "Requested word haven't been found");
+    ctx.reply(titles ? JSON.stringify(titles) : "Requested word haven't been found");
 
     // TODO form appropriate response in html or another form
   };
-
-
-
-
-    
 }

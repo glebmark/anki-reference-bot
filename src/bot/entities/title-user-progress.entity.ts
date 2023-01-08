@@ -5,6 +5,9 @@ import { Title } from './title.entity';
 
 @Entity()
 export class TitleUserProgress extends BaseEntity {
+
+  // TODO make relations as in definition and example
+
   @PrimaryColumn()
   userId: number;
 

@@ -14,6 +14,7 @@ export class Title extends BaseEntity {
   @Column({
     type: 'text',
     nullable: true,
+    unique: true,
   })
   title: string;
 
@@ -37,6 +38,6 @@ export class Title extends BaseEntity {
   })
   partOfSpeech: string;
 
-  @OneToMany(() => Definition, (definition) => definition.title, { cascade: true, eager: true})
+  @OneToMany(() => Definition, (definition) => definition.title, { cascade: ["insert", "update"], eager: true})
   definitions: Definition[]
 }

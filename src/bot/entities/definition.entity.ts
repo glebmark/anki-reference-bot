@@ -7,7 +7,11 @@ export class Definition extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column()
+  titleId: number;
+
   @ManyToOne(() => Title, (title) => title.definitions)
+  @JoinColumn({ name: 'titleId' })
   title: Title
 
   @Column({
