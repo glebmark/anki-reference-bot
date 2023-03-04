@@ -5,7 +5,6 @@ import * as Joi from 'joi';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { createConfig } from './orm-config';
 
-import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { BotModule } from './bot/bot.module';
 import { ParserModule } from './parser/parser.module';
@@ -42,7 +41,7 @@ import { UserModule } from './user/user.module';
     SpeechModule,
     UserModule,
   ],
-  controllers: [AppController],
+  controllers: [],
   providers: [AppService],
 })
 export class AppModule {}

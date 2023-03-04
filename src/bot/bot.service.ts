@@ -1,14 +1,13 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Bot, Context } from 'grammy';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
+import { differenceWith } from 'lodash';
 
 import { ParserService } from '../parser/parser.service';
 import { SpeechService } from '../speech/speech.service';
 import { regExpAllLanguages } from './bot.constants';
-import { LanguageType, Title } from './entities/title.entity';
-import { Example } from './entities/example.entity';
-import { Definition } from './entities/definition.entity';
+import { Title } from './entities/title.entity';
 import { TitleUserProgress } from './entities/title-user-progress.entity';
 
 @Injectable()
@@ -18,10 +17,6 @@ export class BotService implements OnModuleInit {
     private speechService: SpeechService,
     @InjectRepository(Title)
     private titleRepository: Repository<Title>,
-    @InjectRepository(Definition)
-    private definitionRepository: Repository<Definition>,
-    @InjectRepository(Example)
-    private exampleRepository: Repository<Example>,
     @InjectRepository(TitleUserProgress)
     private titleUserProgressRepository: Repository<TitleUserProgress>,
     ) {}
@@ -30,6 +25,9 @@ export class BotService implements OnModuleInit {
     const bot = new Bot(process.env.BOT_TOKEN);
 
     bot.on('message:text', this.onMessage);
+
+    // TODO
+    // bot.catch
 
     bot.api.sendMessage(process.env.TEST_USER, `Bot started at ${new Date()}`);
 
@@ -45,50 +43,46 @@ export class BotService implements OnModuleInit {
       ctx.reply('Bot accepts only text characters');
     }
 
-    const titles = await this.parserService.getTitles(ctx.message.text);
+    const newTitles = await this.parserService.getTitles(ctx.message.text);
 
-    console.dir(titles, { depth: 10 });
+    if (!newTitles) {
+      ctx.reply("Requested word haven't been found");
+    }
 
-    // add transcription
-    // add partOfSpeech
+    const newTitlesWithRightMeta = newTitles.map(({ title, definitions, languageType }) => ({
+      title,
+      languageType,
+      definitions: definitions.map(({ definition, examples }) => ({
+        definition,
+        examples: examples.map(example => ({ example }))
+      }))
+    }))
 
-    const titlesToSave = titles.map(title => {
-
-      const definitions = title.definitions.map(definition => {
-
-        const examples = definition.examples.map(example => {
-          return Example.create({
-            example,
-          })
-        })
-        
-        return Definition.create({ definition: definition.definitionName, examples: examples})
-    
-      })
-
-      return Title.create({
-        title: title.title,
-        languageType: LanguageType.ENGLISH,
-        definitions: definitions, // make shorter
-      })
+    const alreadySavedTitles = await this.titleRepository.find({
+      select: ['id', 'title'],
+      where: {
+        title: In(newTitlesWithRightMeta.map(({ title }) => title))
+      }
     })
 
-    const savedTitles = await this.titleRepository.save(titlesToSave)
+    const titlesToSave = differenceWith(newTitlesWithRightMeta, alreadySavedTitles, 
+      (newTitle, savedTitle) => newTitle.title === savedTitle.title)
 
-    // await this.definitionRepository.find({where: {
-    //   titleId: 1
-    // }})
+    const newSavedTitles = await this.titleRepository.save(titlesToSave)
 
-
+    // get speech only for newTitlesWithRightMeta, don't do this for already saved titles
     if (ctx.message.from.id === +process.env.TEST_USER) {
       
       // await this.speechService.getSpeech()
-
+      // TODO save audio file in DB
     }
 
+    // TODO form appropriate response in html or another form + add speech?
+    // fix Message too long error, may be split in several messages?
 
-    ctx.reply(titles ? JSON.stringify(titles) : "Requested word haven't been found");
+    // retrive audio by [...newSavedTitles.map(({ id }) => id), ...alreadySavedTitles.map(({ id }) => id)]
 
-    // TODO form appropriate response in html or another form
+    ctx.reply(JSON.stringify('done'));
+
   };
 }
