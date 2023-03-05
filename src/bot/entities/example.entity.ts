@@ -1,5 +1,7 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToOne } from 'typeorm';
+
 import { Definition } from './definition.entity';
+import { Resource } from '../../resource/entities/resource.entity';
 
 @Entity()
 export class Example extends BaseEntity {
@@ -18,4 +20,13 @@ export class Example extends BaseEntity {
     nullable: true,
   })
   example: string;
+
+  @Column({
+    nullable: true
+  })
+  audioId: number;
+
+  @OneToOne(() => Resource)
+  @JoinColumn({ name: 'audioId' })
+  audio: Resource;
 }
