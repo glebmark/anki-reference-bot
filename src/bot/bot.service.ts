@@ -49,8 +49,10 @@ export class BotService implements OnModuleInit {
       ctx.reply("Requested word haven't been found");
     }
 
-    const newTitlesWithRightMeta = newTitles.map(({ title, definitions, languageType }) => ({
+    const newTitlesWithRightMeta = newTitles.map(({ title, transcription, partOfSpeech, definitions, languageType }) => ({
       title,
+      transcription,
+      partOfSpeech,
       languageType,
       definitions: definitions.map(({ definition, examples }) => ({
         definition,
@@ -73,7 +75,7 @@ export class BotService implements OnModuleInit {
     // get speech only for newTitlesWithRightMeta, don't do this for already saved titles
     if (ctx.message.from.id === +process.env.TEST_USER) {
       
-      // await this.speechService.getSpeech()
+      await this.speechService.getSpeech()
       // TODO save audio file in DB
     }
 

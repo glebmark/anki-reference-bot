@@ -38,6 +38,6 @@ export class Title extends BaseEntity {
   })
   partOfSpeech: string;
 
-  @OneToMany(() => Definition, (definition) => definition.title, { cascade: ["insert", "update"], eager: true})
+  @OneToMany(() => Definition, (definition) => definition.title, { cascade: ["insert", "update"]})
   definitions: Definition[]
 }

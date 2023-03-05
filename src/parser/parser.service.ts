@@ -32,11 +32,12 @@ export class ParserService {
       .map((entry) => {
         const title = entry.querySelector(`.di-title`).rawText;
 
-        // TODO add transcription
-        // add partOfSpeech
-        // add male or female for french?
+        const partOfSpeech = entry.querySelector(`.pos.dpos`).rawText
+
+        const transcription = entry.querySelector(`.ipa.dipa.lpr-2.lpl-1`).rawText
 
         const definitions = entry.querySelectorAll(`.pr.dsense`).map((definitionElement) => {
+          
           const definition = definitionElement.querySelector(`.def.ddef_d.db`).rawText;
 
           const exampleBlock = definitionElement.querySelector(`.def-body.ddef_b`);
@@ -51,6 +52,8 @@ export class ParserService {
 
         return {
           title,
+          transcription,
+          partOfSpeech,
           languageType: LanguageType.ENGLISH, // add logic eng / fr
           definitions,
         };

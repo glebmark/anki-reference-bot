@@ -10,6 +10,7 @@ import { BotModule } from './bot/bot.module';
 import { ParserModule } from './parser/parser.module';
 import { SpeechModule } from './speech/speech.module';
 import { UserModule } from './user/user.module';
+import { ResourceModule } from './resource/resource.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { UserModule } from './user/user.module';
     ParserModule,
     SpeechModule,
     UserModule,
+    ResourceModule,
   ],
   controllers: [],
   providers: [AppService],

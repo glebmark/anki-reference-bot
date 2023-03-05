@@ -20,6 +20,6 @@ export class Definition extends BaseEntity {
   })
   definition: string;
 
-  @OneToMany(() => Example, (example) => example.definition, { cascade: ["insert", "update"], eager: true })
+  @OneToMany(() => Example, (example) => example.definition, { cascade: ["insert", "update"]})
   examples: Example[]
 }
