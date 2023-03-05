@@ -72,12 +72,11 @@ export class BotService implements OnModuleInit {
 
     const newSavedTitles = await this.titleRepository.save(titlesToSave)
 
-    console.log(newSavedTitles)
+    console.dir(newSavedTitles, { depth: 10 })
 
     if (ctx.message.from.id === +process.env.TEST_USER) {
       
       await this.speechService.downloadSpeechAndSave(newSavedTitles)
-      // TODO save audio file in DB
     }
 
     // await this.speechService.getSpeech()

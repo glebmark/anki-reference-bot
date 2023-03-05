@@ -28,7 +28,7 @@ export class Definition extends BaseEntity {
   @Column({
     nullable: true
   })
-  audioId: number;
+  audioId: string;
 
   @OneToOne(() => Resource)
   @JoinColumn({ name: 'audioId' })

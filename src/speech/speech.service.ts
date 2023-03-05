@@ -2,21 +2,33 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-
 const TextToSpeech = require('@google-cloud/text-to-speech');
 
-import { FileFormat, Resource } from '../resource/entities/resource.entity';
-import { LanguageType } from '../bot/entities/title.entity';
+import { FileFormat } from '../resource/entities/resource.entity';
+import { LanguageType, Title } from '../bot/entities/title.entity';
 import { ResourceService } from '../resource/resource.service';
+import { Definition } from '../bot/entities/definition.entity';
+import { Example } from '../bot/entities/example.entity';
 
+const voiceSettings = { 
+        languageCode: 'en-US', 
+        name: "en-US-Wavenet-J" 
+    }
+    
 export interface Word {
+    id: number;
+    audioId: string;
     title: string;
     transcription: string;
     partOfSpeech: string;
     languageType: LanguageType;
     definitions: {
+        id: number;
+        audioId: string;
         definition: string;
         examples: {
+            id: number;
+            audioId: string;
             example: string;
         }[];
     }[];
@@ -27,36 +39,86 @@ export class SpeechService {
 
     constructor (
         private resourceService: ResourceService,
+        @InjectRepository(Title)
+        private titleRepository: Repository<Title>,
+        @InjectRepository(Definition)
+        private definitionRepository: Repository<Definition>,
+        @InjectRepository(Example)
+        private exampleRepository: Repository<Example>,
     ) {}
 
     downloadSpeechAndSave = async (titles: Word[]) => {
         const googleClient = new TextToSpeech.TextToSpeechClient();
   
-        await Promise.all(titles.map(async ({ title, definitions, }) => {
+        // TODO refactor to make more optimal connections to DB
+        
+        await Promise.all(titles.map(async ({ id: titleId, title, definitions, }) => {
 
             const request = {
               input: { text: title },
               voice: { languageCode: 'en-US', ssmlGender: 'NEUTRAL' },
               audioConfig: { audioEncoding: FileFormat.MP3.toUpperCase() },
             };
-
-            // save filePath (its ok if it will be always same)
-            // after saving filePath you will be able to get uuid and use it as file
-            // then on getSpeech it will be possible to get file by combining filePath + uuid + FileFormat.MP3 (make field fileFormat)
     
             const [response] = await googleClient.synthesizeSpeech(request);
 
-            const savedFile = await this.resourceService.saveAudio(response.audioContent)
+            const fileUuidForTitle = await this.resourceService.saveAudio(response.audioContent)
 
+            await this.titleRepository.update(
+                {
+                    id: titleId
+                }, 
+                {
+                    audioId: fileUuidForTitle
+                })
             
+            await Promise.all(definitions.map(async ({ id: definitionId, definition, examples }) => {
 
-            // TODO save in title id to file
-            
+                const request = {
+                    input: { text: definition },
+                    voice: { languageCode: 'en-US', ssmlGender: 'NEUTRAL' },
+                    audioConfig: { audioEncoding: FileFormat.MP3.toUpperCase() },
+                  };
+          
+                  const [response] = await googleClient.synthesizeSpeech(request);
+      
+                  const fileUuidForDefinition = await this.resourceService.saveAudio(response.audioContent)
+      
+                  await this.definitionRepository.update(
+                      {
+                          id: definitionId
+                      }, 
+                      {
+                          audioId: fileUuidForDefinition
+                      })
+
+                await Promise.all(examples.map(async ({ id: exampleId, example}) => {
+
+                    const request = {
+                        input: { text: example },
+                        voice: voiceSettings,
+                        audioConfig: { audioEncoding: FileFormat.MP3.toUpperCase() },
+                      };
+              
+                      const [response] = await googleClient.synthesizeSpeech(request);
+          
+                      const fileUuidForExample = await this.resourceService.saveAudio(response.audioContent)
+          
+                      await this.exampleRepository.update(
+                          {
+                              id: exampleId
+                          }, 
+                          {
+                              audioId: fileUuidForExample
+                          })
+                }))
+
+            }))
         }))
 
     }
 
-    getSpeech = async () => {
+    getSpeech = async (titles: Word[]) => {
         const googleTTSClient = new TextToSpeech.TextToSpeechClient();
   
         const text = 'hello, world!';

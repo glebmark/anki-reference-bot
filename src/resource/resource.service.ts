@@ -16,7 +16,7 @@ export class ResourceService {
       private resourceRepository: Repository<Resource>,
   ) {}
 
-  saveAudio = async (audioContent ) => {
+  saveAudio = async (audioContent) => {
 
     console.log(audioContent)
    // TODO move to enum 
@@ -27,5 +27,7 @@ export class ResourceService {
    })
 
    await writeFile(FilePath.AUDIO + savedFile.id + '.' + FileFormat.MP3, audioContent) 
+
+   return savedFile.id
   }
 }
