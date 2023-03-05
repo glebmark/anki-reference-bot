@@ -7,7 +7,7 @@ import { differenceWith } from 'lodash';
 import { ParserService } from '../parser/parser.service';
 import { SpeechService } from '../speech/speech.service';
 import { regExpAllLanguages } from './bot.constants';
-import { Title } from './entities/title.entity';
+import { LanguageType, Title } from './entities/title.entity';
 import { TitleUserProgress } from './entities/title-user-progress.entity';
 
 @Injectable()
@@ -72,16 +72,18 @@ export class BotService implements OnModuleInit {
 
     const newSavedTitles = await this.titleRepository.save(titlesToSave)
 
-    // get speech only for newTitlesWithRightMeta, don't do this for already saved titles
+    console.log(newSavedTitles)
+
     if (ctx.message.from.id === +process.env.TEST_USER) {
       
-      await this.speechService.getSpeech()
+      await this.speechService.downloadSpeechAndSave(newSavedTitles)
       // TODO save audio file in DB
     }
 
+    // await this.speechService.getSpeech()
+
     // TODO form appropriate response in html or another form + add speech?
     // fix Message too long error, may be split in several messages?
-
     // retrive audio by [...newSavedTitles.map(({ id }) => id), ...alreadySavedTitles.map(({ id }) => id)]
 
     ctx.reply(JSON.stringify('done'));
