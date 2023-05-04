@@ -1,8 +1,9 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { Bot, Context } from 'grammy';
+import { Bot, Context, InputFile } from 'grammy';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { differenceWith } from 'lodash';
+import { readFile } from 'fs/promises';
 
 import { ParserService } from '../parser/parser.service';
 import { SpeechService } from '../speech/speech.service';
@@ -48,7 +49,7 @@ export class BotService implements OnModuleInit {
       ctx.reply("Requested word haven't been found");
     }
 
-    const newTitles = newTitlesRaw.map(({ title, transcription, partOfSpeech, definitions, languageType }) => ({
+    const newTitles = newTitlesRaw.titles.map(({ title, transcription, partOfSpeech, definitions, languageType }) => ({
       title,
       transcription,
       partOfSpeech,
@@ -87,7 +88,53 @@ export class BotService implements OnModuleInit {
     // fix Message too long error, may be split in several messages?
     // retrive audio by [...newSavedTitles.map(({ id }) => id), ...alreadySavedTitles.map(({ id }) => id)]
 
-    ctx.reply(JSON.stringify('done'));
+    interface x {
+      title: string;
+      transcription: string;
+      partOfSpeech: string;
+      languageType: LanguageType;
+      definitions: {
+          definition: string;
+          examples: {
+              example: string;
+          }[];
+      }[];
+  }[]
+
+    console.dir(newTitles, { depth: 10 })
+
+    const url = `<a href="${newTitlesRaw.url}">${ctx.message.text}</a>`
+
+    console.log(url)
+
+    const message = newTitles.reduce((acc, 
+      { title, 
+        transcription, 
+        partOfSpeech,
+        definitions, }) => {
+
+      const definitionsAndExamplesToSend = definitions.reduce((accDefinitions, { definition, examples }) => {
+
+        const examplesToSend = examples.reduce((accExample, { example }) => {
+
+          return accExample + `\n<i>${example}</i>`
+        }, '')
+
+        return accDefinitions + `\n\n<code>${definition}</code>\n` + examplesToSend
+      }, '')
+          
+      const messagePart = `\n\n<b>${title}</b>` + ` (${partOfSpeech})` +
+      `\n${transcription}` +
+      definitionsAndExamplesToSend
+
+      return acc + messagePart
+    }, '') // TODO better to add url?
+
+    await ctx.reply(message, { parse_mode: 'HTML'});
+
+    const file = await readFile('./audio/0bfc4c9f-fc96-4775-ba72-c9ea3b07dd45.mp3')
+
+    await ctx.replyWithAudio(new InputFile(file));
 
   };
 }

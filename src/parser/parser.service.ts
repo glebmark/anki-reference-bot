@@ -18,12 +18,14 @@ export type IncomingWord = Omit<Word,
 
 @Injectable()
 export class ParserService {
-  getTitles = async (text: string): Promise<Array<IncomingWord>> => {
+  getTitles = async (text: string): Promise<{ url: string, titles: Array<IncomingWord> }> => {
 
     // for phrasal verbs: for example "run off" will be converted to "run-off"
     const titleToParse = text.replace(/\s\b/g, '-'); 
 
-    const rawHtml = await axios.get(`https://dictionary.cambridge.org/dictionary/english/${titleToParse}`);
+    const url = `https://dictionary.cambridge.org/dictionary/english/${titleToParse}`
+
+    const rawHtml = await axios.get(url);
 
     const root = parse(rawHtml.data);
 
@@ -36,7 +38,7 @@ export class ParserService {
       });
     }
 
-    return englishDictionary
+    const incomingWords = englishDictionary
       .querySelector(`.di-body`)
       .querySelectorAll(`.entry`)
       .map((entry) => {
@@ -68,5 +70,10 @@ export class ParserService {
           definitions,
         };
       });
+
+      return {
+        url,
+        titles: incomingWords,
+      }
   };
 }
