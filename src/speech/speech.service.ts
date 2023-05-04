@@ -51,16 +51,16 @@ export interface Word {
 
 interface SpeechesToSave {
     id: number;
-    fileUuid: string;
+    audioId: string;
     definitions: {
         id: number;
-        fileUuid: string;
+        audioId: string;
         examples: {
             id: number;
-            fileUuid: string;
+            audioId: string;
         }[];
     }[];
-}[]
+}
 
 @Injectable()
 export class SpeechService {
@@ -75,10 +75,10 @@ export class SpeechService {
         private exampleRepository: Repository<Example>,
     ) {}
 
-    downloadSpeechAndSave = async (titles: Word[]) => {
+    downloadSpeech = async (titles: Array<Word>): Promise<Array<SpeechesToSave>> => {
         const googleClient = new TextToSpeech.TextToSpeechClient();
 
-        const speechesToSave = await Promise.all(titles.map(async ({ id: titleId, title, definitions, }) => {
+        return await Promise.all(titles.map(async ({ id: titleId, title, definitions, }) => {
 
             const request = {
               input: { text: title },
@@ -135,6 +135,10 @@ export class SpeechService {
             }
         }))
 
+    }
+
+    saveSpeech = async (speechesToSave: Array<SpeechesToSave>): Promise<void> => {
+        
         const titlesToSave = speechesToSave.map(({ id, audioId }) => ({
             id,
             audioId,
@@ -164,27 +168,4 @@ export class SpeechService {
 
     }
 
-    getSpeech = async (titles: Word[]) => {
-        const googleTTSClient = new TextToSpeech.TextToSpeechClient();
-  
-        const text = 'hello, world!';
-  
-        const request = {
-          input: {text: text},
-          voice: { languageCode: 'en-US', ssmlGender: SsmlVoiceGender.NEUTRAL },
-          audioConfig: { audioEncoding: AudioEncoding.MP3 },
-        };
-  
-        const [response] = await googleTTSClient.synthesizeSpeech(request);
-
-        const path = './audio/'
-
-        const filename = 'output.mp3'
-
-        console.log(response.audioContent)
-
-        // await this.speechRepository.save({name: 'dsf'})
-  
-        
-    }
 }

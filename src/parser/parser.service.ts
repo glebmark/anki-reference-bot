@@ -1,12 +1,24 @@
 import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import axios from 'axios';
 import { parse } from 'node-html-parser';
+import { Word } from 'src/speech/speech.service';
 
 import { LanguageType } from '../bot/entities/title.entity';
 
+export type IncomingWord = Omit<Word, 
+  'id' | 
+  'audioId' | 
+  'examples' | 
+  'definitions'> & {
+    definitions: {
+      definition: string;
+      examples: string[];
+    }[]
+}
+
 @Injectable()
 export class ParserService {
-  getTitles = async (text: string) => {
+  getTitles = async (text: string): Promise<Array<IncomingWord>> => {
 
     // for phrasal verbs: for example "run off" will be converted to "run-off"
     const titleToParse = text.replace(/\s\b/g, '-'); 
@@ -16,8 +28,6 @@ export class ParserService {
     const root = parse(rawHtml.data);
 
     const englishDictionary = root.querySelector(`[data-id="cald4"]`);
-
-    // const englishDictionary2 = false
 
     if (!englishDictionary) {
       throw new BadRequestException({
@@ -54,7 +64,7 @@ export class ParserService {
           title,
           transcription,
           partOfSpeech,
-          languageType: LanguageType.ENGLISH, // add logic eng / fr
+          languageType: LanguageType.ENGLISH, // TODO add logic eng / fr
           definitions,
         };
       });

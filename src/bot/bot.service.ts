@@ -28,6 +28,7 @@ export class BotService implements OnModuleInit {
 
     // TODO
     // bot.catch
+    // TODO prevent error on /commands
 
     bot.api.sendMessage(process.env.TEST_USER, `Bot started at ${new Date()}`);
 
@@ -35,21 +36,19 @@ export class BotService implements OnModuleInit {
   }
 
   onMessage = async (ctx: Context) => {
-    const isSuitableText = ctx.hasText(regExpAllLanguages);
+    const isTextValid = ctx.hasText(regExpAllLanguages);
 
-    // TODO prevent error on /commands
-
-    if (!isSuitableText) {
+    if (!isTextValid) {
       ctx.reply('Bot accepts only text characters');
     }
 
-    const newTitles = await this.parserService.getTitles(ctx.message.text);
+    const newTitlesRaw = await this.parserService.getTitles(ctx.message.text);
 
-    if (!newTitles) {
+    if (!newTitlesRaw) {
       ctx.reply("Requested word haven't been found");
     }
 
-    const newTitlesWithRightMeta = newTitles.map(({ title, transcription, partOfSpeech, definitions, languageType }) => ({
+    const newTitles = newTitlesRaw.map(({ title, transcription, partOfSpeech, definitions, languageType }) => ({
       title,
       transcription,
       partOfSpeech,
@@ -63,23 +62,26 @@ export class BotService implements OnModuleInit {
     const alreadySavedTitles = await this.titleRepository.find({
       select: ['id', 'title'],
       where: {
-        title: In(newTitlesWithRightMeta.map(({ title }) => title))
+        title: In(newTitles.map(({ title }) => title))
       }
     })
 
-    const titlesToSave = differenceWith(newTitlesWithRightMeta, alreadySavedTitles, 
+    const titlesToSave = differenceWith(newTitles, alreadySavedTitles, 
       (newTitle, savedTitle) => newTitle.title === savedTitle.title)
 
     const newSavedTitles = await this.titleRepository.save(titlesToSave)
 
     console.dir(newSavedTitles, { depth: 10 })
 
+    // download only for selected user as text-to-speech costs $$$
     if (ctx.message.from.id === +process.env.TEST_USER) {
       
-      await this.speechService.downloadSpeechAndSave(newSavedTitles)
-    }
+      const downloadedSpeech = await this.speechService.downloadSpeech(newSavedTitles)
 
-    // await this.speechService.getSpeech()
+      await this.speechService.saveSpeech(downloadedSpeech)
+
+
+    }
 
     // TODO form appropriate response in html or another form + add speech?
     // fix Message too long error, may be split in several messages?

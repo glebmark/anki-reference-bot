@@ -4,6 +4,10 @@ export enum FileFormat {
   MP3 = 'mp3'
 }
 
+export enum FilePath {
+  AUDIO = './audio/'
+}
+
 @Entity()
 export class Resource extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')

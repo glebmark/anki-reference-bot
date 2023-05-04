@@ -3,11 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { writeFile } from 'fs/promises';
 
-import { FileFormat, Resource } from './entities/resource.entity';
-
-export enum FilePath {
-  AUDIO = './audio/'
-}
+import { FileFormat, FilePath, Resource } from './entities/resource.entity';
 
 @Injectable()
 export class ResourceService {
@@ -16,10 +12,7 @@ export class ResourceService {
       private resourceRepository: Repository<Resource>,
   ) {}
 
-  saveAudio = async (audioContent) => {
-
-    console.log(audioContent)
-   // TODO move to enum 
+  saveAudio = async (audioContent: string | Uint8Array) => {
 
    const savedFile = await this.resourceRepository.save({ 
        filePath: FilePath.AUDIO,
