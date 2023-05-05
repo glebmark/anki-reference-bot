@@ -1,5 +1,5 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { Bot, Context, InputFile } from 'grammy';
+import { Bot, Context, GrammyError, HttpError, InputFile } from 'grammy';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { differenceWith } from 'lodash';
@@ -27,13 +27,23 @@ export class BotService implements OnModuleInit {
 
     bot.on('message:text', this.onMessage);
 
-    // TODO
-    // bot.catch
-    // TODO prevent error on /commands
-
+    bot.start();
+    
     bot.api.sendMessage(process.env.TEST_USER, `Bot started at ${new Date()}`);
 
-    bot.start();
+    bot.catch((err) => {
+      const ctx = err.ctx;
+      console.error(`Error while handling update ${ctx.update.update_id}:`);
+      const e = err.error;
+      if (e instanceof GrammyError) {
+        console.error(e.description);
+        ctx.reply(e.description);
+      } else if (e instanceof HttpError) {
+        console.error("Could not contact Telegram:", e);
+      } else {
+        console.error("Unknown error:", e);
+      }
+    });
   }
 
   onMessage = async (ctx: Context) => {
@@ -77,9 +87,9 @@ export class BotService implements OnModuleInit {
     // download only for selected user as text-to-speech costs $$$
     if (ctx.message.from.id === +process.env.TEST_USER) {
       
-      const downloadedSpeech = await this.speechService.downloadSpeech(newSavedTitles)
+      // const downloadedSpeech = await this.speechService.downloadSpeech(newSavedTitles)
 
-      await this.speechService.saveSpeech(downloadedSpeech)
+      // await this.speechService.saveSpeech(downloadedSpeech)
 
     }
 
@@ -109,7 +119,23 @@ export class BotService implements OnModuleInit {
       return acc + messagePart
     }, '') // TODO better to add url?
 
-    await ctx.reply(message, { parse_mode: 'HTML'});
+    if (message.length > 4000) {
+      const messageFirstSliceToSearch = message.slice(0, 4000)
+
+      const endingsOfDefinitionsAndExamples = [...messageFirstSliceToSearch.matchAll(/e>|i>$/gm)]
+
+      const lastEnding= { ...endingsOfDefinitionsAndExamples[endingsOfDefinitionsAndExamples.length - 1]}
+
+      const lastEndingIndex = lastEnding.index
+      
+      const messageFirstSlice = message.slice(0, lastEndingIndex + 2)
+      const messageSecondSlice = message.slice(lastEndingIndex + 3)
+  
+      await ctx.reply(messageFirstSlice, { parse_mode: 'HTML'});
+      await ctx.reply(messageSecondSlice, { parse_mode: 'HTML'});
+    } else {
+      await ctx.reply(message, { parse_mode: 'HTML'});
+    }
 
     // const file = await readFile('./audio/0bfc4c9f-fc96-4775-ba72-c9ea3b07dd45.mp3')
     // await ctx.replyWithAudio(new InputFile(file));
