@@ -72,7 +72,7 @@ export class BotService implements OnModuleInit {
 
     const newSavedTitles = await this.titleRepository.save(titlesToSave)
 
-    console.dir(newSavedTitles, { depth: 10 })
+    // console.dir(newSavedTitles, { depth: 10 })
 
     // download only for selected user as text-to-speech costs $$$
     if (ctx.message.from.id === +process.env.TEST_USER) {
@@ -81,60 +81,37 @@ export class BotService implements OnModuleInit {
 
       await this.speechService.saveSpeech(downloadedSpeech)
 
-
     }
-
-    // TODO form appropriate response in html or another form + add speech?
-    // fix Message too long error, may be split in several messages?
-    // retrive audio by [...newSavedTitles.map(({ id }) => id), ...alreadySavedTitles.map(({ id }) => id)]
-
-    interface x {
-      title: string;
-      transcription: string;
-      partOfSpeech: string;
-      languageType: LanguageType;
-      definitions: {
-          definition: string;
-          examples: {
-              example: string;
-          }[];
-      }[];
-  }[]
 
     console.dir(newTitles, { depth: 10 })
 
     const url = `<a href="${newTitlesRaw.url}">${ctx.message.text}</a>`
 
-    console.log(url)
-
     const message = newTitles.reduce((acc, 
       { title, 
         transcription, 
         partOfSpeech,
-        definitions, }) => {
+        definitions, }, titleIndex) => {
 
-      const definitionsAndExamplesToSend = definitions.reduce((accDefinitions, { definition, examples }) => {
+      const definitionsAndExamplesToSend = definitions.reduce((accDefinitions, { definition, examples }, definitionIndex) => {
 
         const examplesToSend = examples.reduce((accExample, { example }) => {
 
           return accExample + `\n<i>${example}</i>`
         }, '')
 
-        return accDefinitions + `\n\n<code>${definition}</code>\n` + examplesToSend
+        return accDefinitions + `\n\n<code>${titleIndex + 1}.${definitionIndex + 1}) ${definition}</code>\n` + examplesToSend
       }, '')
           
-      const messagePart = `\n\n<b>${title}</b>` + ` (${partOfSpeech})` +
-      `\n${transcription}` +
-      definitionsAndExamplesToSend
+      const messagePart = `\n\n<b>${titleIndex + 1}) ${title}</b>` + ` (${partOfSpeech})` +
+      `\n${transcription}` + definitionsAndExamplesToSend
 
       return acc + messagePart
     }, '') // TODO better to add url?
 
     await ctx.reply(message, { parse_mode: 'HTML'});
 
-    const file = await readFile('./audio/0bfc4c9f-fc96-4775-ba72-c9ea3b07dd45.mp3')
-
-    await ctx.replyWithAudio(new InputFile(file));
-
+    // const file = await readFile('./audio/0bfc4c9f-fc96-4775-ba72-c9ea3b07dd45.mp3')
+    // await ctx.replyWithAudio(new InputFile(file));
   };
 }
