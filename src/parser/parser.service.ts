@@ -3,7 +3,7 @@ import axios from 'axios';
 import { parse } from 'node-html-parser';
 import { Word } from 'src/speech/speech.service';
 
-import { LanguageType } from '../bot/entities/title.entity';
+import { LanguageType } from '../title/entities/title.entity';
 
 export type IncomingWord = Omit<Word, 
   'id' | 

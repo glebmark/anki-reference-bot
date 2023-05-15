@@ -5,12 +5,13 @@ import * as Joi from 'joi';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { createConfig } from './orm-config';
 
-import { AppService } from './app.service';
 import { BotModule } from './bot/bot.module';
 import { ParserModule } from './parser/parser.module';
 import { SpeechModule } from './speech/speech.module';
 import { UserModule } from './user/user.module';
 import { ResourceModule } from './resource/resource.module';
+import { TitleController } from './title/title.controller';
+import { TitleModule } from './title/title.module';
 
 @Module({
   imports: [
@@ -42,8 +43,9 @@ import { ResourceModule } from './resource/resource.module';
     SpeechModule,
     UserModule,
     ResourceModule,
+    TitleModule,
   ],
-  controllers: [],
-  providers: [AppService],
+  controllers: [TitleController],
+  providers: [],
 })
 export class AppModule {}

@@ -5,10 +5,10 @@ import { Repository } from 'typeorm';
 import TextToSpeech from '@google-cloud/text-to-speech';
 
 import { FileFormat } from '../resource/entities/resource.entity';
-import { LanguageType, Title } from '../bot/entities/title.entity';
+import { LanguageType, Title } from '../title/entities/title.entity';
 import { ResourceService } from '../resource/resource.service';
-import { Definition } from '../bot/entities/definition.entity';
-import { Example } from '../bot/entities/example.entity';
+import { Definition } from '../title/entities/definition.entity';
+import { Example } from '../title/entities/example.entity';
 
 const voiceSettings = { 
         languageCode: 'en-US', 

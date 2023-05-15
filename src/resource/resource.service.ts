@@ -14,6 +14,8 @@ export class ResourceService {
 
   saveAudio = async (audioContent: string | Uint8Array) => {
 
+  // TODO move storage from local to AWS S3
+
    const savedFile = await this.resourceRepository.save({ 
        filePath: FilePath.AUDIO,
        fileFormat: FileFormat.MP3

@@ -4,9 +4,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { SpeechService } from './speech.service';
 import { Resource } from '../resource/entities/resource.entity';
 import { ResourceModule } from '../resource/resource.module';
-import { Title } from '../bot/entities/title.entity';
-import { Definition } from '../bot/entities/definition.entity';
-import { Example } from '../bot/entities/example.entity';
+import { Title } from '../title/entities/title.entity';
+import { Definition } from '../title/entities/definition.entity';
+import { Example } from '../title/entities/example.entity';
 
 @Module({
     imports: [

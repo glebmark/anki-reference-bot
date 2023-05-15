@@ -8,8 +8,8 @@ import { readFile } from 'fs/promises';
 import { ParserService } from '../parser/parser.service';
 import { SpeechService } from '../speech/speech.service';
 import { regExpAllLanguages } from './bot.constants';
-import { LanguageType, Title } from './entities/title.entity';
-import { TitleUserProgress } from './entities/title-user-progress.entity';
+import { LanguageType, Title } from '../title/entities/title.entity';
+import { TitleUserProgress } from '../title/entities/title-user-progress.entity';
 
 @Injectable()
 export class BotService implements OnModuleInit {
