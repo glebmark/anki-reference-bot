@@ -8,12 +8,13 @@ import {
     Request,
     UseGuards,
   } from '@nestjs/common';
+import { TitleService } from './title.service';
 
 @Controller('title')
 export class TitleController {
 
     constructor(
-        // private readonly authService: AuthService,
+        private readonly titleService: TitleService,
       ) {}
     
     
@@ -27,9 +28,9 @@ export class TitleController {
       //   return this.authService.loginWithDeviceId(deviceId, nutakuId, date);
       // }
 
-//     @Get('me')
-//   getProfile(@Request() req): Promise<GetProfileResponseDto> {
-//     return this.userService.getById(req.user.id);
-//   }
+    @Get('me')
+    getTitles() { //: Promise<GetProfileResponseDto>
+        return this.titleService.getTitles();
+    }
 
 }

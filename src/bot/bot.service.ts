@@ -82,14 +82,19 @@ export class BotService implements OnModuleInit {
 
     const newSavedTitles = await this.titleRepository.save(titlesToSave)
 
+    const titlesRequestedByUserAndSaved: Title[] = [...alreadySavedTitles, ...newSavedTitles]
+
+    // TODO add user auth, for now it's just hardcoded first user
+    await this.titleUserProgressRepository.insert(titlesRequestedByUserAndSaved.map(({ id }) => ({ userId: 1, titleId: id })))
+
     // console.dir(newSavedTitles, { depth: 10 })
 
     // download only for selected user as text-to-speech costs $$$
     if (ctx.message.from.id === +process.env.TEST_USER) {
       
-      // const downloadedSpeech = await this.speechService.downloadSpeech(newSavedTitles)
+      const downloadedSpeech = await this.speechService.downloadSpeech(newSavedTitles)
 
-      // await this.speechService.saveSpeech(downloadedSpeech)
+      await this.speechService.saveSpeech(downloadedSpeech)
 
     }
 

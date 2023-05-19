@@ -7,11 +7,6 @@ export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({
-    nullable: false,
-  })
-  userId: number;
-
   @CreateDateColumn({
     name: 'createdAt',
   })
