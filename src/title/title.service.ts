@@ -47,13 +47,18 @@ export class TitleService {
         }, '')
 
         console.log(text)
+
+        const audioUUIDs: string[] = this.resolveAudioUUIDs(titles)
+
+        console.log('\n\n\n')
+        console.log('audioUUIDs')
+        console.log(audioUUIDs)
         
         return {
-            audio: ['uuid1.mp3', 'uuid2.mp3'],
+            audioUUIDs,
             titleIds,
             titleNames,
             text,
-            // add field with just names of titles to show it in showInfo
         }
     }
 
@@ -88,10 +93,33 @@ export class TitleService {
         }, '')
     }
 
+    private resolveAudioUUIDs = (titles: TitleUserProgress[]) => {
+        return titles.reduce((audioIds, { title }) => {
+
+            const definitionAudioIds = title.definitions.reduce((defAudioIds, definition) => {
+
+                const exampleAudioIds = definition.examples.reduce((exAudioIds, example) => {
+
+                    exAudioIds.push(example.audioId)
+
+                    return exAudioIds
+                }, [])
+
+                defAudioIds.push(definition.audioId)
+
+                return [...defAudioIds, ...exampleAudioIds]
+            }, [])
+
+            audioIds.push(title.audioId)
+
+            return [...audioIds, ...definitionAudioIds]
+        }, [])
+    }
+
     confirmTitlesSaved = async (titles: Array<string>) => {
 
         const titlesIds: Array<number> = titles.map(title => Number(title))
-        
+
         console.log('titles')
         console.log(titlesIds)
 

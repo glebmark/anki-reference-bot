@@ -13,6 +13,7 @@ export class Resource extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  // TODO drop field
   @Column({
     type: 'text',
     nullable: true,
