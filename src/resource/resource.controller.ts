@@ -15,7 +15,7 @@ export class ResourceController {
 
     @Get(':uuid')
     async getResource(@Param('uuid') uuid: string) {
-      const file = await this.resourceService.getFileDataStreamById(uuid);
+      const file = await this.resourceService.getReadableDataStreamById(uuid);
 
       return new StreamableFile(file);
     }

@@ -88,9 +88,9 @@ export class BotService implements OnModuleInit {
     // download only for selected user as text-to-speech costs $$$
     if (ctx.message.from.id === +process.env.TEST_USER) {
       
-      // const downloadedSpeech = await this.speechService.downloadSpeech(newSavedTitles)
+      const downloadedSpeech = await this.speechService.downloadSpeech(newSavedTitles)
 
-      // await this.speechService.saveSpeech(downloadedSpeech)
+      await this.speechService.saveSpeech(downloadedSpeech)
 
     }
 
