@@ -54,12 +54,20 @@ export class ParserService {
 
           const exampleBlock = definitionElement.querySelector(`.def-body.ddef_b`);
 
-          const examples = exampleBlock.querySelectorAll(`.eg.deg`).map((example) => example.rawText);
+          const examplesUnrestricted = exampleBlock.querySelectorAll(`.eg.deg`).map((example) => example.rawText);
 
-          return {
-            definition,
-            examples,
-          };
+          // take only chosen amount of examples as many of them could overload card
+          const examples = examplesUnrestricted.slice(0, Number(process.env.AMOUNT_OF_EXAMPLES))
+          
+          // drop definitions without examples
+          if (examples.length >= 1) {
+            return {
+              definition,
+              examples,
+            };
+          } else {
+            return
+          }
         });
 
         return {
@@ -67,7 +75,7 @@ export class ParserService {
           transcription,
           partOfSpeech,
           languageType: LanguageType.ENGLISH, // TODO add logic eng / fr
-          definitions,
+          definitions: definitions.filter(Boolean),
         };
       });
 
