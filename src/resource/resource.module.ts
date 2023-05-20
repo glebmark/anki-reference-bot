@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Resource } from './entities/resource.entity';
+import { ResourceController } from './resource.controller';
 import { ResourceService } from './resource.service';
 
 @Module({
@@ -9,6 +10,7 @@ import { ResourceService } from './resource.service';
       Resource,
     ]),
   ],
+  controllers: [ResourceController],
   providers: [ResourceService],
   exports: [ResourceService],
 })

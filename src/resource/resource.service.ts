@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { writeFile } from 'fs/promises';
+import { writeFile, readFile } from 'fs/promises';
+import { Readable } from 'typeorm/platform/PlatformTools';
 
 import { FileFormat, FilePath, Resource } from './entities/resource.entity';
 
@@ -24,5 +25,26 @@ export class ResourceService {
    await writeFile(FilePath.AUDIO + savedFile.id + '.' + FileFormat.MP3, audioContent) 
 
    return savedFile.id
+  }
+
+  async getFileDataStreamById(uuid: string) {
+
+    console.log('uuid:')
+    console.log(uuid)
+
+    const resource: Buffer = await readFile(FilePath.AUDIO + uuid + '.' + FileFormat.MP3) 
+
+    // console.log('resource:')
+    // console.log(resource)
+
+    const stream = new Readable();
+
+    if (resource) {
+      stream.push(resource);
+    }
+
+    stream.push(null);
+
+    return stream;
   }
 }

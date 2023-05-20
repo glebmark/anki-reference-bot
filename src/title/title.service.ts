@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { castArray } from 'lodash';
 import { In, Repository } from 'typeorm';
+
 import { Definition } from './entities/definition.entity';
 import { Example } from './entities/example.entity';
 import { TitleUserProgress } from './entities/title-user-progress.entity';
@@ -30,7 +32,7 @@ export class TitleService {
             ]
         })
 
-        console.dir(titles, {depth: 10})
+        // console.dir(titles, {depth: 10})
 
         // title names are only for displaying in Anki pop-up
         const titleNames = titles.map(({ title: { title } }) => title).join('<br><br>')
@@ -46,13 +48,13 @@ export class TitleService {
             return titlesText += definitionsText
         }, '')
 
-        console.log(text)
+        // console.log(text)
 
         const audioUUIDs: string[] = this.resolveAudioUUIDs(titles)
 
-        console.log('\n\n\n')
-        console.log('audioUUIDs')
-        console.log(audioUUIDs)
+        // console.log('\n\n\n')
+        // console.log('audioUUIDs')
+        // console.log(audioUUIDs)
         
         return {
             audioUUIDs,
@@ -118,10 +120,7 @@ export class TitleService {
 
     confirmTitlesSaved = async (titles: Array<string>) => {
 
-        const titlesIds: Array<number> = titles.map(title => Number(title))
-
-        console.log('titles')
-        console.log(titlesIds)
+        const titlesIds: Array<number> = castArray(titles).map(title => Number(title))
 
         await this.titleUserProgressRepository.update({
             userId: 1,
