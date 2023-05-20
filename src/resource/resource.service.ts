@@ -6,7 +6,7 @@ import { Upload } from '@aws-sdk/lib-storage';
 import { S3Client, HeadObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 import type { Readable } from 'stream'
 
-import { FileFormat, FilePath, Resource } from './entities/resource.entity';
+import { FileFormat, Resource } from './entities/resource.entity';
 
 @Injectable()
 export class ResourceService {
@@ -18,7 +18,6 @@ export class ResourceService {
   saveAudio = async (audioContent: string | Uint8Array) => {
 
    const savedFile = await this.resourceRepository.save({ 
-       filePath: FilePath.AUDIO,
        fileFormat: FileFormat.MP3
    })
 
