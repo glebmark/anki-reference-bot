@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Definition } from './entities/definition.entity';
 import { Example } from './entities/example.entity';
 import { TitleUserProgress } from './entities/title-user-progress.entity';
@@ -32,6 +32,13 @@ export class TitleService {
 
         console.dir(titles, {depth: 10})
 
+        // title names are only for displaying in Anki pop-up
+        const titleNames = titles.map(({ title: { title } }) => title).join('<br><br>')
+
+        // title id's are only for subsequent confirmation by POST that titles were saved
+        const titleIds = titles.map(({ title: { id } }) => id)
+
+        // text is for importing in Anki deck
         const text = titles.reduce((titlesText, { title }): string => {
 
             const definitionsText = this.resolveDefinitionsText(title)
@@ -40,11 +47,12 @@ export class TitleService {
         }, '')
 
         console.log(text)
-  
+        
         return {
             audio: ['uuid1.mp3', 'uuid2.mp3'],
-            titleIds: [1, 2, 3],
-            text: "TextForFront\tTextForBack.[sound:accomplish_example.mp3]\nTextForFront2\tTextForBack2."
+            titleIds,
+            titleNames,
+            text,
             // add field with just names of titles to show it in showInfo
         }
     }
@@ -56,16 +64,16 @@ export class TitleService {
 
             const soundOfTitle = `[sound:${audioId}.${audio.fileFormat}]`
             
-            const frontOfCard = title + soundOfTitle + '<br><br>' + 
-            transcription + '<br><br>' + partOfSpeech + '<br><br><br><br>' + examplesText
+            const frontOfCard = '<b>' + title + '</b>' + '<br><br>' + 
+            transcription + soundOfTitle + partOfSpeech + '<br><br><br><br>' + examplesText
 
             const soundOfDefinition = `[sound:${definition.audioId}.${definition.audio.fileFormat}]`
             
             const backOfCard = definition.definition + soundOfDefinition + '<br><br>'
             
-            const recognitionCard = frontOfCard + '\t' + backOfCard + '\n\n\n'
+            const recognitionCard = frontOfCard + '\t' + backOfCard + '\n'
 
-            const recallCard = backOfCard + '\t' + frontOfCard + '\n\n\n'
+            const recallCard = backOfCard + '\t' + frontOfCard + '\n'
             
             return definitionText += recognitionCard + recallCard
         }, '')
@@ -80,5 +88,20 @@ export class TitleService {
         }, '')
     }
 
-    // TODO function POST with id's of titiles which were saved
+    confirmTitlesSaved = async (titles: Array<string>) => {
+
+        const titlesIds: Array<number> = titles.map(title => Number(title))
+        
+        console.log('titles')
+        console.log(titlesIds)
+
+        await this.titleUserProgressRepository.update({
+            userId: 1,
+            titleId: In(titlesIds)
+        },
+        {
+            isSavedToAnki: true
+        }
+        )
+    }
 }

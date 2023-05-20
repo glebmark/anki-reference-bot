@@ -4,6 +4,7 @@ import {
     Get,
     Param,
     Post,
+    Query,
     Redirect,
     Request,
     UseGuards,
@@ -16,21 +17,17 @@ export class TitleController {
     constructor(
         private readonly titleService: TitleService,
       ) {}
-    
-    
-      // @ApiVersion()
-      // @ApiTags('auth')
-      // // @UseGuards(LocalAuthGuard)
-      // @Post('auth/login')
-      // async login(
-      //   @Body() { deviceId, nutakuId, date }: LoginDto,
-      // ): Promise<LoginResponseDto> {
-      //   return this.authService.loginWithDeviceId(deviceId, nutakuId, date);
-      // }
 
-    @Get('me')
+    @Get()
     getTitles() { //: Promise<GetProfileResponseDto>
         return this.titleService.getTitles();
+    }
+
+    @Post()
+    async confirmTitles(
+      @Query('titles') titles: Array<string>
+    ){
+      return this.titleService.confirmTitlesSaved(titles);
     }
 
 }
