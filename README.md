@@ -1,73 +1,83 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
-
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+This bot works in pair with [Anki Reference Addon](https://github.com/glebmark/anki-reference-addon)
 
-## Installation
+add terminology, what is title, definition, example
+## Development - Running the app without Docker
 
+### Clone repo and create .env file
 ```bash
-$ npm install
+# clone repo
+git clone https://github.com/glebmark/anki-reference-bot.git
+# copy env file
+cp .env.example .env
 ```
 
-## Running the app
+### Set envs 
+#### Telegram
+- [create Telegram bot](https://core.telegram.org/bots/features#creating-a-new-bot) and obtain bot token, set to BOT_TOKEN
+- in order to save money as Google's Text-To-Speech costs $$$, you could restrict usage of TTS to one particular user: find out your User ID, for example call /start within @userinfobot bot in Telegram, and set id to TEST_USER
+#### App
+- set in AMOUNT_OF_EXAMPLES desired amount of examples per definition, some definitions could have a lot of them (2-3 should be enough)
+#### Database
+- change POSTGRES_USER, POSTGRES_PASSWORD and POSTGRES_DB
+- change user, password and db name in DB_URL accordingly to previous step
+#### Google Cloud
+- create account in Google Cloud
+- activate Text-To-Speech in Products section
+- add [Service Account Key](https://cloud.google.com/docs/authentication/application-default-credentials#GAC)
+- download google_cloud_key.json, set it's location to GOOGLE_APPLICATION_CREDENTIALS
+#### AWS
+- create account in Amazon's AWS
 
+- setup S3 bucket
+- set name to S3_BUCKET_NAME, region to AWS_REGION
+
+- add User in IAM
+- grant AmazonS3FullAccess in Permissions policies of added User
+- create Access Key in Security Credentials of added User
+- set key to AWS_ACCESS_KEY, secret to AWS_SECRET_ACCESS_KEY
+
+
+### Start app
 ```bash
+$ npm run ci
+
 # development
 $ npm run start
 
 # watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+$ npm run dev
 ```
 
-## Test
+## Deployment
 
+_This method suitable only for personal use on VPS, do not use it for production (see "TODO - Proper CI/CD" section below)._
+
+Set env variables in .env (see section "Set envs" above).
+
+Connect to VPS via SSH and run as follows:
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+$ git clone https://github.com/glebmark/anki-reference-bot.git
 ```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+Then run locally:
+```bash
+# copy your google_cloud_key.json
+$ scp -P <port_number> google_cloud_key.json <user_name>@<ip_address>:/root/anki-reference-bot
+# copy .env file with envs which have been set previously
+$ scp -P <port_number> .env <user_name>@<ip_address>:/root/anki-reference-bot
+```
+Then run on VPS:
+Connect back to VPS and run:
+```bash
+docker compose build
+docker compose up --detach
+```
+## TODO
+### Proper CI/CD
+For further development use proper way for deployment of images and envs:
+- in docker-compose.yml remove loading envs from .env, add envs separatly and also set them at cloud provider, for example App in Digital Ocean or Dyno in Heroku
+- add Container Registry, for example on Docker Hub
+- setup Github Action for building and pushing docker images to [Docker Hub](https://docs.github.com/en/actions/publishing-packages/publishing-docker-images)
+- deploy [webhook](https://github.com/adnanh/webhook) to VPS, setup endpoint which executes script, which pulls updated images from Docker Hub
+- add a job which evokes this endpoint after publishing new images
