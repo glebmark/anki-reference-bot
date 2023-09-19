@@ -2,8 +2,7 @@
 
 Anki-Reference-Bot is a service which helps with language learning by automating of creation of Anki cards. It allows add new words through Telegram bot and parse definitions and examples from dictionaries like Cambridge Dictionary and generating text-to-speech with Google Cloud's neural network as well.
 
-This service works together with [Anki Reference Addon]
-(https://github.com/glebmark/anki-reference-addon)
+This service works together with [Anki Reference Addon](https://github.com/glebmark/anki-reference-addon)
 
 ## Terminology
 - word: it's what user type in Telegram bot, for example "get along"
@@ -76,7 +75,6 @@ $ scp -P <port_number> google_cloud_key.json <user_name>@<ip_address>:/root/anki
 # copy .env file with envs (see "Set envs" section above)
 $ scp -P <port_number> .env <user_name>@<ip_address>:/root/anki-reference-bot
 ```
-Then run on VPS:
 Connect back to VPS and run:
 ```bash
 docker compose build
