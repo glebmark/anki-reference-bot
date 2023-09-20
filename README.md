@@ -1,6 +1,8 @@
 ## Description
 
-Anki-Reference-Bot is a service which helps with language learning by automating of creation of Anki cards. It allows add new words through Telegram bot and parse definitions and examples from dictionaries like Cambridge Dictionary and generating text-to-speech with Google Cloud's neural network as well.
+Anki Reference Bot is a service which helps with language learning by automating of creation of [Anki](https://apps.ankiweb.net) flash cards. It allows add new words through Telegram bot and parse definitions and examples from dictionaries like Cambridge Dictionary and generating text-to-speech with Google Cloud's neural network as well.
+
+Currently supported only English and French languages.
 
 This service works together with [Anki Reference Addon](https://github.com/glebmark/anki-reference-addon)
 
